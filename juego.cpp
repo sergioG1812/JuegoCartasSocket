@@ -8,28 +8,25 @@ using namespace std;
 Juego::Juego(const vector<string>& nombres) {
     for (auto& n : nombres)
         jugadores.emplace_back(n);
-    jugadores[0].setLocal(true);   // Servidor
-    jugadores[1].setLocal(false);  // Cliente
+    jugadores[0].setLocal(true);
+    jugadores[1].setLocal(false);
 }
 
 void Juego::repartirCartas() {
-    // 1) Generar mazo único
+    
     mazo.clear();
     for (int c = 0; c < 4; ++c)
         for (int v = 0; v < 10; ++v)
             mazo.emplace_back(static_cast<Color>(c), v);
 
-    // 2) Barajar
     mt19937 rng(random_device{}());
     shuffle(mazo.begin(), mazo.end(), rng);
 
-    // 3) Limpiar estado previo
     for (auto& j : jugadores) {
         j.vaciarMano();
         j.vaciarCartasGanadas();
     }
 
-    // 4) Repartir alternativamente
     int turno = 0, nJ = jugadores.size();
     for (auto& carta : mazo) {
         jugadores[turno].agregarCarta(carta);
