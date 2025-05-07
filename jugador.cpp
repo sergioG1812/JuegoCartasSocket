@@ -40,9 +40,9 @@ Carta Jugador::jugarCarta() {
     }
 
     int opcion;
-    cout << "Elige número de carta [1-" << mano.size() << "]: ";
+    cout << "Elige numero de carta [1-" << mano.size() << "]: ";
     while (!(cin >> opcion) || opcion < 1 || opcion > (int)mano.size()) {
-        cout << "Índice inválido. Intenta de nuevo: ";
+        cout << "Indice inválido. Intenta de nuevo: ";
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
@@ -64,13 +64,13 @@ int Jugador::getNumeroCartas() const {
 
 Carta Jugador::getCartaEnMano(int idx) const {
     if (idx < 0 || idx >= (int)mano.size())
-        throw out_of_range("Índice de carta fuera de rango");
+        throw out_of_range("Indice de carta fuera de rango");
     return mano[idx];
 }
 
 void Jugador::quitarCarta(int idx) {
     if (idx < 0 || idx >= (int)mano.size())
-        throw out_of_range("Índice de carta fuera de rango");
+        throw out_of_range("Indice de carta fuera de rango");
     ultimaJugadaIdx = idx;
     mano.erase(mano.begin() + idx);
 }
