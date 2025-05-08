@@ -8,7 +8,7 @@
 using namespace std;
 
 #define PORT      8080
-#define SERVER_IP "127.0.0.1"    // Conexión local
+#define SERVER_IP "127.0.0.1"
 
 int main() {
     WSADATA wsa;
