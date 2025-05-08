@@ -9,8 +9,9 @@ using namespace std;
 
 class Juego {
 public:
-    Juego(const vector<string>& nombres);
+    explicit Juego(const vector<string>& nombres);
 
+    void repartirCartas();
     void jugarSocketServer(SOCKET sock, uint64_t puerto);
     void jugarSocketClient(SOCKET sock);
 
@@ -18,7 +19,7 @@ private:
     vector<Jugador> jugadores;
     vector<Carta>   mazo;
 
-    void repartirCartas();
-    bool juegoTerminado() const;
-    void jugarTurnoLocal(int idxJugador);
+    void resolverRonda(const Carta& serv, const Carta& cli, SOCKET sock);
 };
+
+
