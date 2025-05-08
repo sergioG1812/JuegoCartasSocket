@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <vector>
 #include <string>
 #include <stdexcept>
@@ -14,13 +14,8 @@ public:
     bool esJugadorLocal() const;
 
     void vaciarMano();
-    void vaciarCartasGanadas();
     void agregarCarta(const Carta& c);
-
-    Carta jugarCarta();
-    int   getUltimaCartaJugadaIndice() const;
-
-    int   getNumeroCartas() const;
+    int  getNumeroCartas() const;
     Carta getCartaEnMano(int idx) const;
     void  quitarCarta(int idx);
 
