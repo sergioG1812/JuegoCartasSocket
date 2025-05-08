@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <string>
 #include <winsock2.h>
@@ -8,7 +8,7 @@
 using namespace std;
 
 #define PORT      8080
-#define SERVER_IP "192.168.1.9"
+#define SERVER_IP "127.0.0.1"    // Conexión local
 
 int main() {
     WSADATA wsa;
@@ -18,17 +18,24 @@ int main() {
     }
 
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == INVALID_SOCKET) {
+        cerr << "Socket creation failed: " << WSAGetLastError() << "\n";
+        WSACleanup();
+        return 1;
+    }
+
     sockaddr_in serv{};
-    serv.sin_family      = AF_INET;
-    serv.sin_port        = htons(PORT);
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(PORT);
     serv.sin_addr.s_addr = inet_addr(SERVER_IP);
 
     if (connect(sock, (sockaddr*)&serv, sizeof(serv)) == SOCKET_ERROR) {
         cerr << "Connect failed: " << WSAGetLastError() << "\n";
+        closesocket(sock);
         WSACleanup();
         return 1;
     }
-    cout << "Conectado al servidor.\n";
+    cout << "Conectado al servidor en localhost\n";
 
     vector<string> nombres = { "Servidor", "Cliente" };
     Juego juego(nombres);
