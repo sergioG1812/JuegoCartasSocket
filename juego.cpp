@@ -24,6 +24,7 @@ void Juego::repartirCartas() {
     }
     mt19937 rng(random_device{}());
     shuffle(mazo.begin(), mazo.end(), rng);
+
     size_t turno = 0;
     while (!mazo.empty()) {
         jugadores[turno].agregarCarta(mazo.back());
@@ -33,29 +34,37 @@ void Juego::repartirCartas() {
 }
 
 void Juego::resolverRonda(const Carta& serv, const Carta& cli, SOCKET sock) {
-    if (serv == cli) {
-        string msg = "EMPATE";
-        send(sock, msg.c_str(), (int)msg.size() + 1, 0);
-    }
-    else if (serv > cli) {
-        jugadores[0].agregarCartaGanada(serv);
-        jugadores[0].agregarCartaGanada(cli);
-        string msg = "SERVIDOR_GANA";
-        send(sock, msg.c_str(), (int)msg.size() + 1, 0);
-    }
-    else {
+    
+    cout << "\n[ Ronda ] Servidor jugo "; serv.mostrar();
+    cout << " | Cliente jugo "; cli.mostrar();
+    cout << "\n";
 
+    
+    if (serv.getColor() == cli.getColor() && cli.getValor() > serv.getValor()) {
+        cout << "Resultado: Cliente gana la ronda\n";
         jugadores[1].agregarCartaGanada(serv);
         jugadores[1].agregarCartaGanada(cli);
         string msg = "CLIENTE_GANA";
         send(sock, msg.c_str(), (int)msg.size() + 1, 0);
     }
+    else if (serv.getColor() == cli.getColor() && cli.getValor() == serv.getValor()) {
+        cout << "Resultado: Empate en la ronda\n";
+        string msg = "EMPATE";
+        send(sock, msg.c_str(), (int)msg.size() + 1, 0);
+    }
+    else {
+        cout << "Resultado: Servidor gana la ronda\n";
+        jugadores[0].agregarCartaGanada(serv);
+        jugadores[0].agregarCartaGanada(cli);
+        string msg = "SERVIDOR_GANA";
+        send(sock, msg.c_str(), (int)msg.size() + 1, 0);
+    }
 }
 
 void Juego::jugarSocketServer(SOCKET sock, uint64_t /*puerto*/) {
-    // Reparto inicial
     repartirCartas();
 
+    
     int numCliente = jugadores[1].getNumeroCartas();
     send(sock, reinterpret_cast<char*>(&numCliente), sizeof(numCliente), 0);
     for (int i = 0; i < numCliente; ++i) {
@@ -65,29 +74,52 @@ void Juego::jugarSocketServer(SOCKET sock, uint64_t /*puerto*/) {
         send(sock, reinterpret_cast<char*>(&col), sizeof(col), 0);
         send(sock, reinterpret_cast<char*>(&val), sizeof(val), 0);
     }
+
     
     while (jugadores[0].getNumeroCartas() > 0 && jugadores[1].getNumeroCartas() > 0) {
-       
-        Carta serv = jugadores[0].getCartaEnMano(0);
-        jugadores[0].quitarCarta(0);
-        int scol = serv.getColor(), sval = serv.getValor();
+        
+        Jugador& serv = jugadores[0];
+        cout << "\n MANO (SERVIDOR) " << endl;
+        for (int i = 0; i < serv.getNumeroCartas(); ++i) {
+            cout << "[" << i << "] "; serv.getCartaEnMano(i).mostrar(); cout << endl;
+        }
+        int idx;
+        do {
+            cout << "Servidor, elige indice de carta: "; cin >> idx;
+        } while (cin.fail() || idx < 0 || idx >= serv.getNumeroCartas());
+
+        Carta cartaServ = serv.getCartaEnMano(idx);
+        serv.quitarCarta(idx);
+        int scol = static_cast<int>(cartaServ.getColor());
+        int sval = cartaServ.getValor();
         send(sock, reinterpret_cast<char*>(&scol), sizeof(scol), 0);
         send(sock, reinterpret_cast<char*>(&sval), sizeof(sval), 0);
+        cout << "-> Servidor juega: "; cartaServ.mostrar(); cout << endl;
 
-       
+        
         int ccol, cval;
-        recv(sock, reinterpret_cast<char*>(&ccol), sizeof(ccol), 0);
+        if (recv(sock, reinterpret_cast<char*>(&ccol), sizeof(ccol), 0) <= 0) break;
         recv(sock, reinterpret_cast<char*>(&cval), sizeof(cval), 0);
-        Carta cli(static_cast<Color>(ccol), cval);
+        Carta cartaCli(static_cast<Color>(ccol), cval);
+        cout << "-> Cliente juega: "; cartaCli.mostrar(); cout << endl;
+
+        
+        resolverRonda(cartaServ, cartaCli, sock);
+    }
 
     
-        resolverRonda(serv, cli, sock);
-    }
+    int servGan = jugadores[0].getCartasGanadas();
+    int cliGan = jugadores[1].getCartasGanadas();
+    cout << "\n=== Fin de la partida ===" << endl;
+    cout << "Servidor cartas ganadas: " << servGan << endl;
+    cout << "Cliente cartas ganadas: " << cliGan << endl;
+    if (servGan > cliGan) cout << "¡Servidor gana la partida!" << endl;
+    else if (servGan < cliGan) cout << "¡Cliente gana la partida!" << endl;
+    else cout << "La partida termina en empate." << endl;
 }
 
-
 void Juego::jugarSocketClient(SOCKET sock) {
-
+    
     int num;
     recv(sock, reinterpret_cast<char*>(&num), sizeof(num), 0);
     jugadores[1].vaciarMano();
@@ -97,37 +129,59 @@ void Juego::jugarSocketClient(SOCKET sock) {
         recv(sock, reinterpret_cast<char*>(&val), sizeof(val), 0);
         jugadores[1].agregarCarta(Carta(static_cast<Color>(col), val));
     }
+
+    int servGan = 0, cliGan = 0;
     
-    cout << "-- MANO CLIENTE (" << num << " cartas) --\n";
-    for (int i = 0; i < jugadores[1].getNumeroCartas(); ++i) {
-        jugadores[1].getCartaEnMano(i).mostrar();
-        cout << "\n";
-    }
-    cout << "\n";
-   
     while (jugadores[1].getNumeroCartas() > 0) {
-       
+        
         int scol, sval;
         if (recv(sock, reinterpret_cast<char*>(&scol), sizeof(scol), 0) <= 0) break;
         recv(sock, reinterpret_cast<char*>(&sval), sizeof(sval), 0);
-        Carta serv(static_cast<Color>(scol), sval);
-        cout << "Servidor juega: "; serv.mostrar(); cout << "\n";
+        Carta cartaServ(static_cast<Color>(scol), sval);
+        cout << "\n-> Servidor juega: "; cartaServ.mostrar(); cout << endl;
 
-       
-        Carta cli = jugadores[1].getCartaEnMano(0);
-        jugadores[1].quitarCarta(0);
-        int ccol = cli.getColor(), cval = cli.getValor();
+        
+        Jugador& cli = jugadores[1];
+        cout << " MANO (CLIENTE) " << endl;
+        for (int i = 0; i < cli.getNumeroCartas(); ++i) {
+            cout << "[" << i << "] "; cli.getCartaEnMano(i).mostrar(); cout << endl;
+        }
+        int idx;
+        do {
+            cout << "Cliente, elige indice de carta: "; cin >> idx;
+        } while (cin.fail() || idx < 0 || idx >= cli.getNumeroCartas());
+
+        Carta cartaCli = cli.getCartaEnMano(idx);
+        cli.quitarCarta(idx);
+        int ccol = static_cast<int>(cartaCli.getColor());
+        int cval = cartaCli.getValor();
         send(sock, reinterpret_cast<char*>(&ccol), sizeof(ccol), 0);
         send(sock, reinterpret_cast<char*>(&cval), sizeof(cval), 0);
-        cout << "Cliente juega: "; cli.mostrar(); cout << "\n";
+        cout << "-> Cliente juega: "; cartaCli.mostrar(); cout << endl;
 
-     
+        
         char buf[32];
         recv(sock, buf, sizeof(buf), 0);
         string result(buf);
-        if (result == "EMPATE") cout << "-> Empate\n\n";
-        else if (result == "SERVIDOR_GANA") cout << "-> Servidor gana\n\n";
-        else if (result == "CLIENTE_GANA") cout << "-> Cliente gana\n\n";
+        if (result == "CLIENTE_GANA") {
+            cout << "Resultado: Cliente gana la ronda" << endl;
+            
+            cliGan += 2;
+        }
+        else if (result == "SERVIDOR_GANA") {
+            cout << "Resultado: Servidor gana la ronda" << endl;
+            servGan += 2;
+        }
+        else {
+            cout << "Resultado: Empate en la ronda" << endl;
+        }
     }
-    cout << ">> Fin del juego <<\n";
+
+    
+    cout << "\n=== Fin de la partida ===" << endl;
+    cout << "Servidor cartas ganadas: " << servGan << endl;
+    cout << "Cliente cartas ganadas: " << cliGan << endl;
+    if (servGan > cliGan) cout << "¡Servidor gana la partida!" << endl;
+    else if (servGan < cliGan) cout << "¡Cliente gana la partida!" << endl;
+    else cout << "La partida termina en empate." << endl;
 }
