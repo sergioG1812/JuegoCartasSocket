@@ -11,14 +11,18 @@ primero deberan dar clic derecho en cualquier parte de la pantalla para abrir un
 
 ![image](https://github.com/user-attachments/assets/c5f85588-c556-4e89-adc5-84ce5e4c231b)
 
--IMPORTANTE: Primero deberan arrastrar el archivo JuegoServidor.exe a la terminal, ya que si primero lo hacen con JuegoCartasCliente no les servira.
+-IMPORTANTE: Primero deberan lanzar el archivo JuegoServidor.exe a la terminal, ya que si primero lo hacen con JuegoCartasCliente no les servira.
 
-Luego de arrastrar el archivo a la terminal, deberan darle espacio y escribir "8080" (sin comillas), ya que aqui sera el puerto al que se conectara cliente, ya luego de esto le dan enter
+para lanzar el .exe deberan escribir lo siguiente (.\JuegoServidor.exe 8080) ya que si lo inician de otra manera no les 
+
+(Recuerden escribir el puerto (8080) ya que si no les pide como parametro el puerto obligatoriamente)
 
 luego les debera aparecer un mensaje de esperando cliente en localhost en el puerto: 8080
 
 ya para inicializar cliente no seria necesario escribir el puerto ya que por defecto se conecta a ese
 
-para cliente deberan hacer lo mismo, abrir una terminal, copiar la ruta de acceso del archivo y dar enter
+para cliente deberan hacer lo mismo, abrir una terminal, escribir (.\JuegoCartasCliente.exe) y darle enter
+
+RECORDAR: importante que la terminal la abran en la misma carpeta donde tienen los archivos ejecutables, ya que si no les aparecera un error de que no encuntra dicho archivo
 
 y listo, pueden disfrutar su juego de manera local host 
