@@ -11,7 +11,7 @@ primero deberan dar clic derecho en cualquier parte de la pantalla para abrir un
 
 ![image](https://github.com/user-attachments/assets/c5f85588-c556-4e89-adc5-84ce5e4c231b)
 
--IMPORTANTE: Primero deberan lanzar copiar arrastrar el archivo JuegoServidor.exe, ya que si primero lo hacen con JuegoCartasCliente no les servira.
+-IMPORTANTE: Primero deberan arrastrar el archivo JuegoServidor.exe a la terminal, ya que si primero lo hacen con JuegoCartasCliente no les servira.
 
 Luego de arrastrar el archivo a la terminal, deberan darle espacio y escribir "8080" (sin comillas), ya que aqui sera el puerto al que se conectara cliente, ya luego de esto le dan enter
 
