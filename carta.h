@@ -1,22 +1,30 @@
-#pragma once
-#include <string>
-#include <iostream>
+#ifndef CARTA_H
+#define CARTA_H
 
-using namespace std;
+#include <iostream>
 
 enum Color { Amarillo, Azul, Rojo, Negro };
 
 class Carta {
 public:
+
+    Carta() : color(Amarillo), valor(0) {}
+
+    
     Carta(Color color, int valor);
+
     Color getColor() const;
     int   getValor() const;
-    void  mostrar() const;
 
-    bool operator==(const Carta& o) const { return color == o.color && valor == o.valor; }
-    bool operator>(const Carta& o)  const { return valor > o.valor; }
+    
+    void mostrar() const;
+
+    bool operator==(const Carta& o) const;
+    bool operator>(const Carta& o)  const;
 
 private:
     Color color;
     int   valor;
 };
+
+#endif 
