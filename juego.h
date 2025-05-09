@@ -21,5 +21,3 @@ private:
 
     void resolverRonda(const Carta& serv, const Carta& cli, SOCKET sock);
 };
-
-
