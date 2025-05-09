@@ -3,7 +3,6 @@ using namespace std;
 Carta::Carta(Color c, int v)
     : color(c), valor(v) {
 }
-
 Color Carta::getColor() const { return color; }
 int   Carta::getValor() const { return valor; }
 
