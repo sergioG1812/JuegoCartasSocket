@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include "Juego.h"
@@ -47,7 +48,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    cout << "Esperando cliente en localhost:" << PORT << "...\n";
+    cout << "Esperando cliente en localhost en el puerto: " << PORT << " \n";
 
     SOCKET clientSock = accept(listenSock, nullptr, nullptr);
     if (clientSock == INVALID_SOCKET) {
@@ -57,12 +58,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    cout << "Cliente conectado en localhost.\n";
+    cout << "Cliente conectado en localhost. \n";
 
     vector<string> nombres = { "Servidor", "Cliente" };
     Juego juego(nombres);
     juego.jugarSocketServer(clientSock, static_cast<uint64_t>(PORT));
-
     closesocket(clientSock);
     closesocket(listenSock);
     WSACleanup();
