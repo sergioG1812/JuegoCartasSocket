@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
 #include "Juego.h"
 #pragma comment(lib, "Ws2_32.lib")
@@ -35,12 +36,11 @@ int main() {
         WSACleanup();
         return 1;
     }
-    cout << "Conectado al servidor en localhost\n";
+    cout << "Conectado al servidor en localhost \n";
 
     vector<string> nombres = { "Servidor", "Cliente" };
     Juego juego(nombres);
     juego.jugarSocketClient(sock);
-
     closesocket(sock);
     WSACleanup();
     return 0;
