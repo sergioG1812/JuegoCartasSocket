@@ -1,16 +1,23 @@
-#include "Carta.h"
-
+#include "carta.h"
 using namespace std;
-
-static const char* nombresColor[] = { "Amarillo", "Azul", "Rojo", "Negro" };
-
-Carta::Carta(Color color_, int valor_)
-    : color(color_), valor(valor_) {
+Carta::Carta(Color c, int v)
+    : color(c), valor(v) {
 }
 
 Color Carta::getColor() const { return color; }
 int   Carta::getValor() const { return valor; }
 
 void Carta::mostrar() const {
-    cout << nombresColor[color] << " " << valor;
+    static const char* nombres[] = { "Amarillo", "Azul", "Rojo", "Negro" };
+    cout << "[" << nombres[color] << " " << valor << "]";
+}
+
+bool Carta::operator==(const Carta& o) const {
+    return color == o.color && valor == o.valor;
+}
+
+bool Carta::operator>(const Carta& o) const {
+    
+    if (color != o.color) return color > o.color;
+    return valor > o.valor;
 }
